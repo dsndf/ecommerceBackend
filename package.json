@@ -5,8 +5,8 @@
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": " SET NODE_ENV=production && node ./src/app.cjs"
-    ,"dev":"SET  NODE_ENV=development && node ./src/app.cjs"
+    "start": " set NODE_ENV=production && node ./src/app.cjs"
+    ,"dev":"set  NODE_ENV=development && node ./src/app.cjs"
   },
   "author": "Gaurav Jain",
   "license": "ISC",
