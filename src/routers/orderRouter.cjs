@@ -3,7 +3,6 @@ const orderRouter = express.Router();
 const orderCollection = require('../models/order.cjs');
 const userAuthentication = require('../middleware/userauth.cjs')
 const verifyRole = require('../middleware/verifyRole.cjs')
-const ErrorHandler = require('../utils/errorThrow.cjs');
 const updateStocks = require('../utils/updateStocks.cjs');
 const errorThrow = require('../utils/errorThrow.cjs');
 orderRouter.route('/order/new').post(userAuthentication, async (req, res, next) => {

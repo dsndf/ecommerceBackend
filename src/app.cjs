@@ -36,9 +36,7 @@ const app = express();
  app.use(urlencoded({ extended: false }));
 app.use(cookieparser());
 app.use(express.json());
-app.use(bodyparser.urlencoded({extended:true}));
 app.use(fileUpload());
-
 app.use(ProductRouter);
 
 app.use(userRouter);

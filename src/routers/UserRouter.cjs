@@ -324,7 +324,11 @@ userRouter.route('/admin/single/user/:id').get(userAuth, verifyRole("admin"), as
 userRouter.route('/logout').get(userAuth, async (req, res, next) => {
     try {
         console.log(req.cookies);
-        res.clearCookie('token');
+        res.clearCookie('token',{
+            httpOnly:true,
+            secure:process.env.NODE_ENV==="production"?true:false,
+            sameSite:process.env.NODE_ENV==="production"?"none":false,
+        });
         res.send({
             success: true,
             message: "Logout Successfully"
@@ -410,7 +414,7 @@ userRouter.route('/admin/stats').get(userAuth,verifyRole("admin"), async (req, r
     try {
        const users = await UserCollection.countDocuments();
        const orders = await OrderCollection.countDocuments();
-       const data = await OrderCollection.aggregate(
+        const data = await OrderCollection.aggregate(
 [
  {
     $group:{
@@ -425,22 +429,22 @@ userRouter.route('/admin/stats').get(userAuth,verifyRole("admin"), async (req, r
 
 
        )
-       console.log(data)
 
    
        const products = await ProductCollection.find();
        let outOfStock=0;
+       if(products!==[]){
        for(let i of products){
         if(i.stocks === 0){
             outOfStock++;
         }
        }
-    
+       }
 res.send ({
     users,
     orders,
    products:products.length,
-    income:data[0].income,
+    income:data.length?data[0].income:0,
   inStock:products.length-outOfStock,
   outOfStock
 
