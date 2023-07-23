@@ -30,7 +30,7 @@ cloudinary.config({
 
 const app = express();
  app.use(cors({
-    origin:process.env.FRONTEND,
+    origin:"localhost:3000",
     credentials:true
  }));
  app.use(urlencoded({ extended: false }));
