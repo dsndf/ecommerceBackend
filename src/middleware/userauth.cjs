@@ -2,7 +2,7 @@
 const jwt = require('jsonwebtoken');
 
 const UserCollection = require('../models/user.cjs');
-const { default: errorThrow } = require('../utils/errorThrow.cjs');
+const errorThrow  = require('../utils/errorThrow.cjs');
 
 const userAuth = async (req, res, next) => {
 

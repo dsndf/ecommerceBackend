@@ -1,4 +1,3 @@
-const { Router } = require('express');
 const express = require('express');
 const Products = require('../models/product.cjs');
 const ProductRouter = express.Router();
