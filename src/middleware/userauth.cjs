@@ -2,6 +2,7 @@
 const jwt = require('jsonwebtoken');
 
 const UserCollection = require('../models/user.cjs');
+const { default: errorThrow } = require('../utils/errorThrow.cjs');
 
 const userAuth = async (req, res, next) => {
 
@@ -9,7 +10,7 @@ const userAuth = async (req, res, next) => {
         const { token } = req.cookies;
 
         if (!token) {
-            throw new Error("Please Log in");
+            throw errorThrow("Please Log In",401);
         }
 
 
@@ -21,10 +22,7 @@ const userAuth = async (req, res, next) => {
         next()
     }
     catch (err) {
-
-        next(err,400);
-
-
+        next(err);
     }
 
 }

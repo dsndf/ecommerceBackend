@@ -1,3 +1,4 @@
+const { default: errorThrow } = require("../utils/errorThrow.cjs");
 
 
 const verifyRole = (role) => {
@@ -8,7 +9,7 @@ const verifyRole = (role) => {
 
         if (req.user.role !== role) {
               
-                throw new Error('Only admin can access resources at this route');
+                throw errorThrow('Only admin can access resources at this route',403);
 
         }
 
@@ -16,7 +17,6 @@ const verifyRole = (role) => {
 
     }
     catch(err){
-   err.statusCode = 400;
         next(err);
     }
 
