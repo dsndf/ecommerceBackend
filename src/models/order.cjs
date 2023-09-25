@@ -72,7 +72,8 @@ const orderSchema = new mongoose.Schema({
     },
 
     paidAt: {
-        type: Date
+        type: Date,
+       default : Date.now()
     },
     itemsPrice: {
         type: Number,

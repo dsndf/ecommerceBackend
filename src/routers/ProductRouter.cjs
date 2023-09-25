@@ -50,10 +50,7 @@ ProductRouter.route('/product/:id').get(async (req, res, next) => {
         const product = await Products.findById(id);
 
         if (!product) {
-            let err = new Error("Product not found");
-            err.statusCode = 400;
-            throw err;
-
+          throw  errorThrow("Product Not Found",404);
         }
 
         res.send({
@@ -118,8 +115,8 @@ ProductRouter.post('/admin/new/product', userAuthentiction, verifyRole('admin'),
         }
         req.body.images = newimages;
         const newProduct = await Products.create(req.body);
-        console.log(newProduct);
-        res.send({
+    
+        res.status(201).send({
             success: true,
             newProduct
         })
@@ -140,7 +137,7 @@ ProductRouter.put('/product/:id', userAuthentiction, verifyRole('admin'), async 
         let data = await Products.findById({ _id: req.params.id });
         if (!data) {
 
-            throw new Error("Product  not found");
+            throw errorThrow("Product  Not Found",404);
 
         }
 
@@ -176,32 +173,7 @@ ProductRouter.put('/product/:id', userAuthentiction, verifyRole('admin'), async 
         next(err);
     }
 });
-//  THIS IS ADMIN ROUTE "ONLY ADMIN CAN ACCESS THIS ROUTE "
-
-ProductRouter.route('/admin/product/:id').delete(userAuthentiction, verifyRole('admin'), async (req, res, next) => {
-    try {
-
-        console.log(req.params);
-        let data = await Products.findByIdAndDelete(req.params.id);
-        console.log(data);
-        let flag = data == null;
-        if (flag) {
-            throw new Error("Product not found");
-        }
-
-        res.send({
-            succes: true,
-            message: "Product Deleted"
-        })
-    }
-
-    catch (err) {
-        next(err);
-    }
-});
-
 ProductRouter.route('/review/product/:id').put(userAuthentiction, async (req, res, next) => {
-
     try {
         const user_id = req.user.id;
 
@@ -233,9 +205,6 @@ ProductRouter.route('/review/product/:id').put(userAuthentiction, async (req, re
 
         product.rating = sum / product.numOfReviews;
 
-
-
-        console.log(product);
         await product.save({ validationBeforeSave: false });
 
         res.send(product);
@@ -248,6 +217,31 @@ ProductRouter.route('/review/product/:id').put(userAuthentiction, async (req, re
 
 });
 
+//  THIS IS ADMIN ROUTE "ONLY ADMIN CAN ACCESS THIS ROUTE "
+
+ProductRouter.route('/admin/product/:id').delete(userAuthentiction, verifyRole('admin'), async (req, res, next) => {
+    try {
+
+        console.log(req.params);
+        let data = await Products.findByIdAndDelete(req.params.id);
+        console.log(data);
+        let flag = data == null;
+        if (flag) {
+            throw errorThrow("Product  Not Found",404);
+        }
+
+        res.send({
+            succes: true,
+            message: "Product Deleted"
+        })
+    }
+
+    catch (err) {
+        next(err);
+    }
+});
+
+
 ProductRouter.route('/admin/product/reviews').get(async (req, res, next) => {
 
     try {
@@ -258,9 +252,7 @@ ProductRouter.route('/admin/product/reviews').get(async (req, res, next) => {
         let product = await Products.findById(productId);
 
         if (!product) {
-            let err = new Error("Product not found");
-            err.statusCode = 404;
-            throw err;
+            throw errorThrow("Product  Not Found",404);
         }
 
 
@@ -273,7 +265,7 @@ ProductRouter.route('/admin/product/reviews').get(async (req, res, next) => {
 
 })
 
-ProductRouter.route('/admin/review').delete(userAuthentiction, verifyRole("admin"), async (req, res, next) => {
+ProductRouter.route('/admin/product/review').delete(userAuthentiction, verifyRole("admin"), async (req, res, next) => {
 
     try {
         console.log(req.query);
@@ -317,9 +309,6 @@ ProductRouter.route('/admin/review').delete(userAuthentiction, verifyRole("admin
     }
 
 });
-
-
-
 
 ProductRouter.route('/admin/all/products').get(userAuthentiction, verifyRole("admin"), async (req, res, next) => {
     try {

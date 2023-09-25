@@ -37,7 +37,7 @@ userRouter.route("/user/register").post(async (req, res, next) => {
         });
 
         let token = await userDoc.generateToken();
-
+        res.status(201); 
         userResponse(userDoc, token, req, res);
     } catch (err) {
         next(err);
@@ -53,7 +53,7 @@ userRouter.route("/user/login").post(async (req, res, next) => {
         console.log(data);
         if (!data) {
 
-            throw new Error("Invalid Login");
+            throw new errorThrow("Invalid Login",401);
         }
 
         console.log(data.password);
@@ -65,7 +65,7 @@ userRouter.route("/user/login").post(async (req, res, next) => {
             console.log("this is token ", token);
             userResponse(data, token, req, res);
         } else {
-            throw errorThrow("Invalid Login", 400);
+            throw errorThrow("Invalid Login", 401);
         }
     } catch (err) {
         next(err);
@@ -78,26 +78,16 @@ userRouter.route("/user/login").post(async (req, res, next) => {
 userRouter.route('/user/new_password').post(async (req, res, next) => {
 
     try {
-
         const { email } = req.body;
 
         let userDoc = await UserCollection.findOne({ email });
         console.log(userDoc);
         if (!userDoc) {
-            let err = new Error("Oops User Not Found");
-            err.statusCode = 404;
-            throw err;
-
+            throw errorThrow("User Not Found", 404);
         }
 
         const resetToken = await userDoc.generateResetPasswordToken(next);
-
-        console.log("this is reset token ", resetToken);
-
         let data = await userDoc.save({ validateBeforeSave: false });
-        console.log(data);
-
-
         //Creating link 
         // const resetPasswordUrl = `${req.protocol}://${req.get('host')}/password/reset/${resetToken}`;
         const resetPasswordUrl = `${process.env.HOST}/password/reset/${resetToken}`;
@@ -142,11 +132,11 @@ userRouter.route('/user/password/reset/:token').put(async (req, res, next) => {
 
         const user = await UserCollection.findOne({ resetPasswordToken, resetPasswordExpire: { $gt: new Date(Date.now()) } })
         if (!user) {
-            throw new Error("Invalid reset password token or token expired");
+            throw new errorThrow("Invalid reset password token or token expired",401); 
         }
 
         if (req.body.password !== req.body.confirmPassword) {
-            throw new Error("Password and Confirmed password are not matched");
+            throw new errorThrow("Password and Confirmed password are not matched",401);
 
         }
         user.password = req.body.password;
@@ -184,14 +174,12 @@ userRouter.route('/user/password/update').put(userAuth, async (req, res, next) =
         const ismatched = await bcrypt.compare(oldPassword, user.password);
 
         if (!ismatched) {
-            let err = new Error("Invalid password")
-            err.statusCode = 400;
+            let err = new errorThrow("Invalid password",401);
             throw err;
         }
         if (newPassword !== confirmPassword) {
-            let err = new Error(" password not matched")
-            err.statusCode = 400;
-            throw err;
+        throw  new errorThrow("password not matched",401);
+        
         }
 
         user.password = newPassword;
@@ -217,9 +205,7 @@ userRouter.route('/user/password/update').put(userAuth, async (req, res, next) =
 
 
 // user details
-
 userRouter.route('/my').put(userAuth, async (req, res, next) => {
-
     try {
         console.log("this is", req.body);
         const { name, email, avatar } = req.body;
@@ -268,9 +254,7 @@ userRouter.route('/my').put(userAuth, async (req, res, next) => {
 
 
 userRouter.route('/my').get(userAuth, async (req, res, next) => {
-
     try {
- console.log("load user");
         const userdata = await UserCollection.findById(req.user.id);
         res.send({
             success: true,
@@ -372,11 +356,8 @@ const user = await UserCollection.findById(req.params.id);
 if(!user){
 throw errorThrow("User Not Found",404);
 }
-
 else{
- 
   await UserCollection.findByIdAndUpdate(req.params.id,req.body);
- 
  res.send({
     success:true
  })
@@ -433,7 +414,7 @@ userRouter.route('/admin/stats').get(userAuth,verifyRole("admin"), async (req, r
    
        const products = await ProductCollection.find();
        let outOfStock=0;
-       if(products!==[]){
+       if(products.length>0){
        for(let i of products){
         if(i.stocks === 0){
             outOfStock++;

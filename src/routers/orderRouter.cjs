@@ -8,8 +8,6 @@ const errorThrow = require('../utils/errorThrow.cjs');
 orderRouter.route('/order/new').post(userAuthentication, async (req, res, next) => {
 
     const { shippingInfo, orderItems, itemsPrice, taxPrice, shippingPrice, paymentInfo, paidAt, totalPrice } = req.body;
-
-    console.log("this backend ", orderItems);
     try {
 
         const order = await orderCollection.create({
@@ -24,7 +22,7 @@ orderRouter.route('/order/new').post(userAuthentication, async (req, res, next) 
             user: req.user.id
         });
 
-        res.send({
+        res.status(201).send({
             success: true,
             order
         })
@@ -42,7 +40,7 @@ orderRouter.route('/order/:id').get(userAuthentication, async (req, res, next) =
             "user",
             "name email");
         if (!order) {
-            throw errorThrow("There is no order exits", 400);
+            throw errorThrow("Order Not Found", 404);
         }
 
         res.send({
@@ -63,7 +61,7 @@ orderRouter.route('/orders/me').get(userAuthentication, async (req, res, next) =
 
         const order = await orderCollection.find({ user: req.user.id });
         if (!order) {
-            throw errorThrow("There is no order exits", 400);
+            throw errorThrow("There is no order", 404);
         }
 
         res.send({
@@ -83,7 +81,7 @@ orderRouter.route('/admin/orders').get(userAuthentication, verifyRole('admin'), 
 
         const orders = await orderCollection.find();
         if (!orders) {
-            throw errorThrow("There are no orders", 400);
+            throw errorThrow("There is no order", 404);
         }
 
         let totalPrice = 0;
@@ -105,8 +103,6 @@ orderRouter.route('/admin/orders').get(userAuthentication, verifyRole('admin'), 
 
 })
 
-
-
 orderRouter.route('/admin/order/:id').put(userAuthentication, verifyRole("admin"), async (req, res, next) => {
 
     try {
@@ -114,7 +110,7 @@ orderRouter.route('/admin/order/:id').put(userAuthentication, verifyRole("admin"
         const order = await orderCollection.findById(req.params.id);
 
         if (order.orderStatus === "Delivered") {
-            throw errorThrow("You have been delivered this product", 400);
+            throw errorThrow("Order Already Delivered",409);
         }
 
         order.orderStatus = req.body.status;
@@ -150,17 +146,13 @@ orderRouter.route('/admin/order/:id').delete(userAuthentication, verifyRole("adm
 
         const order = await orderCollection.findById(req.params.id);
         if (!order) {
-            throw errorThrow("You have already deleted this order", 400);
+            throw errorThrow("Order Not Found", 404);
         }
-        console.log(order);
         await order.remove();
-
         res.send({
             success: true,
             message: "Order has been  deleted succesfully"
         })
-
-
     }
     catch (err) {
         next(err);
