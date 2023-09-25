@@ -1,4 +1,4 @@
-const { default: errorThrow } = require("../utils/errorThrow.cjs");
+const  errorThrow  = require("../utils/errorThrow.cjs");
 
 
 const verifyRole = (role) => {
