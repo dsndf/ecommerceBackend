@@ -52,7 +52,6 @@ userRouter.route("/user/login").post(async (req, res, next) => {
         const { email, password } = req.body;
 
         const data = await UserCollection.findOne({ email }).select("+password");
-        console.log(data);
         if (!data) {
 
             throw  errorThrow("Invalid Login",401);

@@ -220,15 +220,14 @@ ProductRouter.route('/review/product/:id').put(userAuthentiction, async (req, re
 
 ProductRouter.route('/admin/product/:id').delete(userAuthentiction, verifyRole('admin'), async (req, res, next) => {
     try {
-
-        console.log(req.params);
-        let data = await Products.findByIdAndDelete(req.params.id);
-        console.log(data);
-        let flag = data == null;
-        if (flag) {
+        let data = await Products.findById(req.params.id);
+        if (!data) {
             throw errorThrow("Product  Not Found",404);
         }
-
+      for(let image of data.images){
+      await cloudinary.v2.uploader.destroy(image.public_id);
+      }  
+      await data.remove();
         res.send({
             succes: true,
             message: "Product Deleted"
