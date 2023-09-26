@@ -7,8 +7,7 @@ const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 paymentRouter.route("/payment/process").post(userAuthentication, async (req, res, next) => {
 
     try {
-        console.log(req.body);
-        
+
         const myPayment = await stripe.paymentIntents.create({
             amount: req.body.amount,
             payment_method: req.body.id,

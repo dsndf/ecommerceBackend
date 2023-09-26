@@ -20,12 +20,14 @@ userRouter.route("/user").get((req, res) => {
 
 userRouter.route("/user/register").post(async (req, res, next) => {
     try {
-        console.log("this is", req.body);
         const myCloud = await cloudinary.v2.uploader.upload(req.body.avatar, {
             folder: "avatars"
         });
         const { name, email, password } = req.body;
-
+        const data = await UserCollection.findOne({email}); 
+        if(data){
+            throw errorThrow("User Already Exists",409);
+        }
         const userDoc = await UserCollection.create({
             name,
             email,
@@ -53,11 +55,11 @@ userRouter.route("/user/login").post(async (req, res, next) => {
         console.log(data);
         if (!data) {
 
-            throw new errorThrow("Invalid Login",401);
+            throw  errorThrow("Invalid Login",401);
         }
 
         console.log(data.password);
-
+         errorThrow
         const ismatched = await bcrypt.compare(password, data.password);
         console.log(ismatched);
         if (ismatched) {
@@ -132,11 +134,11 @@ userRouter.route('/user/password/reset/:token').put(async (req, res, next) => {
 
         const user = await UserCollection.findOne({ resetPasswordToken, resetPasswordExpire: { $gt: new Date(Date.now()) } })
         if (!user) {
-            throw new errorThrow("Invalid reset password token or token expired",401); 
+            throw  errorThrow("Invalid reset password token or token expired",401); 
         }
 
         if (req.body.password !== req.body.confirmPassword) {
-            throw new errorThrow("Password and Confirmed password are not matched",401);
+            throw  errorThrow("Password and Confirmed password are not matched",401);
 
         }
         user.password = req.body.password;
@@ -174,11 +176,11 @@ userRouter.route('/user/password/update').put(userAuth, async (req, res, next) =
         const ismatched = await bcrypt.compare(oldPassword, user.password);
 
         if (!ismatched) {
-            let err = new errorThrow("Invalid password",401);
+            let err =  errorThrow("Invalid password",401);
             throw err;
         }
         if (newPassword !== confirmPassword) {
-        throw  new errorThrow("password not matched",401);
+        throw   errorThrow("password not matched",401);
         
         }
 

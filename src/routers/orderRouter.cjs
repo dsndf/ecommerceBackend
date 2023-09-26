@@ -42,7 +42,7 @@ orderRouter.route('/order/:id').get(userAuthentication, async (req, res, next) =
         if (!order) {
             throw errorThrow("Order Not Found", 404);
         }
-
+     
         res.send({
             success: true,
             order
