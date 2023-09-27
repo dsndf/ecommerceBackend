@@ -263,25 +263,18 @@ ProductRouter.route('/admin/product/reviews').get(async (req, res, next) => {
 
 })
 
-ProductRouter.route('/admin/product/review').delete(userAuthentiction, verifyRole("admin"), async (req, res, next) => {
+ProductRouter.route('/admin/review').delete(userAuthentiction, verifyRole("admin"), async (req, res, next) => {
 
     try {
-        console.log(req.query);
-        const { user, productId } = req.query;
-
+        const { reviewId, productId } = req.query;
         const product = await Products.findById(productId);
         if (!product) {
             throw errorThrow("Product Not Found", 404);
         }
-        console.log(product.reviews)
-        let reviews = product.reviews.filter((v) => {
-
-            return v._id.toString() !== user.toString();
-
-        });
+        let reviews = product.reviews.filter((v) =>v._id.toString() !== reviewId);
+        console.log(product.reviews.length);
 
         product.reviews = reviews;
-        console.log(product.reviews)
 
         product.numOfReviews = product.reviews.length;
         let sum = 0;

@@ -10,6 +10,9 @@ orderRouter.route('/order/new').post(userAuthentication, async (req, res, next) 
     const { shippingInfo, orderItems, itemsPrice, taxPrice, shippingPrice, paymentInfo, paidAt, totalPrice } = req.body;
     try {
 
+
+
+
         const order = await orderCollection.create({
             shippingInfo
             , orderItems
@@ -22,6 +25,9 @@ orderRouter.route('/order/new').post(userAuthentication, async (req, res, next) 
             user: req.user.id
         });
 
+          orderItems.forEach(async (v) => {  
+            await updateStocks(v.product, v.quantity);
+           });
         res.status(201).send({
             success: true,
             order
@@ -118,12 +124,7 @@ orderRouter.route('/admin/order/:id').put(userAuthentication, verifyRole("admin"
             order.deliveredAt = Date.now();
         }
 
-        if (order.orderStatus === "Shipped") {
-            order.orderItems.forEach(async (v) => {
 
-                await updateStocks(v.product, v.quantity);
-            });
-        }
 
 
         await order.save();
