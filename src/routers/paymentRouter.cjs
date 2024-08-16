@@ -9,7 +9,7 @@ paymentRouter.route("/payment/process").post(userAuthentication, async (req, res
     try {
 
         const myPayment = await stripe.paymentIntents.create({
-            amount: req.body.amount,
+            amount: req.body.amount*100,
             payment_method: req.body.id,
             currency: "inr",
             description:"Red store payment using stripe",
