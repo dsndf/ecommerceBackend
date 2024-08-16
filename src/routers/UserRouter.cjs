@@ -91,7 +91,7 @@ userRouter.route('/user/new_password').post(async (req, res, next) => {
         let data = await userDoc.save({ validateBeforeSave: false });
         //Creating link 
         // const resetPasswordUrl = `${req.protocol}://${req.get('host')}/password/reset/${resetToken}`;
-        const resetPasswordUrl = `${process.env.HOST}/user/password/reset/${resetToken}`;
+        const resetPasswordUrl = `${process.env.FRONTEND}/password/reset/${resetToken}`;
 
         const message = `Your reset password token is \n\n ${resetPasswordUrl} \n\n If you didn't do this activity then Please ignore this.`
 
