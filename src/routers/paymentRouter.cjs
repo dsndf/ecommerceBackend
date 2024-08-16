@@ -12,6 +12,7 @@ paymentRouter.route("/payment/process").post(userAuthentication, async (req, res
             amount: req.body.amount,
             payment_method: req.body.id,
             currency: "inr",
+            description:"Red store payment using stripe",
             metadata: {
                 company: "Ecommerce",
             }
